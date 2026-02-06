@@ -1,5 +1,4 @@
-# StockMaster-Pro
-TP1 JAVA EE
+
 \documentclass[11pt,a4paper]{article}
 
 \usepackage[utf8]{inputenc}
