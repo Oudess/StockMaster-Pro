@@ -1,0 +1,36 @@
+/* Général */
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* Carte accueil */
+.home-card {
+    max-width: 420px;
+    border-radius: 12px;
+}
+
+/* Login */
+.login-card {
+    max-width: 380px;
+    border-radius: 12px;
+}
+
+/* Catalogue */
+.table thead {
+    background-color: #f8f9fa;
+}
+
+.catalogue-container {
+    margin-top: 40px;
+}
+
+/* Bouton déconnexion */
+.logout-btn {
+    border: none;
+    background: transparent;
+    color: #dc3545;
+}
+
+.logout-btn:hover {
+    text-decoration: underline;
+}
