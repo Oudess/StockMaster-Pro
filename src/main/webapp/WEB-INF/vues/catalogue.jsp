@@ -18,7 +18,9 @@
         </span>
 
         <form action="logout" method="post">
-            <button type="submit" class="logout-btn">Déconnexion</button>
+            <button type="submit" class="logout-btn">
+                Déconnexion
+            </button>
         </form>
     </div>
 </nav>

@@ -30,7 +30,8 @@ public class AuthentificationFilter implements Filter {
             chain.doFilter(request, response);
         } else {
             // Pas authentifié → redirection
-            res.sendRedirect(req.getContextPath() + "/login.jsp");
+            res.sendRedirect(res.encodeRedirectURL("login.jsp"));
+
         }
     }
 }

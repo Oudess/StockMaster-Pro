@@ -1,4 +1,10 @@
 package com.stock.service;
 
-public class IStockService {
+import com.stock.model.Produit;
+import java.util.List;
+
+public interface IStockService {
+
+    List<Produit> recupererCatalogueFiltre();
+
 }

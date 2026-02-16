@@ -1,36 +1,41 @@
 package com.stock.controller;
 
-import com.stock.dao.IProduitDAO;
-import com.stock.dao.ProduitDAOImpl;
 import com.stock.model.Produit;
+import com.stock.service.IStockService;
+import com.stock.service.StockServiceImpl;
 
-import com.stock.service.ProduitService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Cookie;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
+import jakarta.servlet.http.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @WebServlet("/catalogue")
 public class CatalogueServlet extends HttpServlet {
-    private IProduitDAO produitDAO = new ProduitDAOImpl();
+
+    private IStockService service;
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    public void init() {
+        service = new StockServiceImpl();
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response)
             throws ServletException, IOException {
 
-        // 🔹 Lecture du cookie lastVisit
+        // ==============================
+        // 1️⃣ Lecture du cookie lastVisit
+        // ==============================
+
         String lastVisit = "Première visite";
 
         Cookie[] cookies = request.getCookies();
+
         if (cookies != null) {
             for (Cookie c : cookies) {
                 if ("lastVisit".equals(c.getName())) {
@@ -40,28 +45,55 @@ public class CatalogueServlet extends HttpServlet {
             }
         }
 
-        // 🔹 Création / mise à jour du cookie
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy-HH:mm:ss");
-        String now = LocalDateTime.now().format(formatter);
+        // ==============================
+        // 2️⃣ Vérification du consentement
+        // ==============================
 
-        Cookie cookie = new Cookie("lastVisit", now);
-        cookie.setMaxAge(24 * 60 * 60); // 24 heures
-        response.addCookie(cookie);
+        boolean consentGiven = false;
 
-        ProduitService service = new ProduitService();
-        List<Produit> produits = service.getProduits();
+        if (cookies != null) {
+            for (Cookie c : cookies) {
+                if ("cookieConsent".equals(c.getName())
+                        && "accept".equals(c.getValue())) {
+                    consentGiven = true;
+                    break;
+                }
+            }
+        }
 
-        request.setAttribute("listeProduits", produits);
+        // ==============================
+        // 3️⃣ Création du cookie si accepté
+        // ==============================
 
+        if (consentGiven) {
+
+            DateTimeFormatter formatter =
+                    DateTimeFormatter.ofPattern("dd/MM/yyyy-HH:mm:ss");
+
+            String now = LocalDateTime.now().format(formatter);
+
+            Cookie newCookie = new Cookie("lastVisit", now);
+            newCookie.setMaxAge(24 * 60 * 60); // 24h
+            newCookie.setPath("/");
+
+            response.addCookie(newCookie);
+        }
+
+        // ==============================
+        // 4️⃣ Récupération des produits
+        // ==============================
+
+        List<Produit> produits =
+                service.recupererCatalogueFiltre();
 
         request.setAttribute("listeProduits", produits);
         request.setAttribute("lastVisit", lastVisit);
 
+        // ==============================
+        // 5️⃣ Forward UNIQUE vers JSP
+        // ==============================
+
         request.getRequestDispatcher("/WEB-INF/vues/catalogue.jsp")
                 .forward(request, response);
-        request.setAttribute("produits", produitDAO.findAll());
-        request.getRequestDispatcher("/catalogue.jsp")
-                .forward(request, response);
     }
-
 }

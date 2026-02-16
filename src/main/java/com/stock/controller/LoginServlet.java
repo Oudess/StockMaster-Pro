@@ -21,10 +21,11 @@ public class LoginServlet extends HttpServlet {
 
         if ("admin".equals(login) && "123".equals(password)) {
 
-            HttpSession session = request.getSession();
+            HttpSession session = request.getSession(true);
             session.setAttribute("user", login);
 
-            response.sendRedirect("catalogue");
+            response.sendRedirect(response.encodeRedirectURL("catalogue"));
+
 
         } else {
             request.setAttribute("erreur", "Login ou mot de passe incorrect");
